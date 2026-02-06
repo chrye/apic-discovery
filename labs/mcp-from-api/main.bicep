@@ -96,6 +96,7 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' existing
   ]
 }
 
+// register weather API to APIM and API Center
 module weatherAPIModule 'src/weather/api/api.bicep' = {
   name: 'weatherAPIModule'
   params: {
@@ -109,6 +110,7 @@ module weatherAPIModule 'src/weather/api/api.bicep' = {
   ]
 }
 
+// register weather MCP to APIM and API Center
 module weatherMCPModule 'src/weather/mcp-server/mcp.bicep' = {
   name: 'weatherMCPModule'
   params: {
@@ -124,6 +126,7 @@ module weatherMCPModule 'src/weather/mcp-server/mcp.bicep' = {
   ]
 }
 
+// register product catalog API to APIM and API Center
 module productCatalogAPIModule 'src/product-catalog/api/api.bicep' = {
   name: 'productCatalogAPIModule'
   params: {
@@ -137,6 +140,7 @@ module productCatalogAPIModule 'src/product-catalog/api/api.bicep' = {
   ]
 }
 
+// register product catalog MCP to APIM and API Center
 module productCatalogMCPModule 'src/product-catalog/mcp-server/mcp.bicep' = {
   name: 'productCatalogMCPModule'
   params: {
@@ -152,6 +156,7 @@ module productCatalogMCPModule 'src/product-catalog/mcp-server/mcp.bicep' = {
   ]
 }
 
+// register place order API to APIM and API Center
 module placeOrderAPIModule 'src/place-order/api/api.bicep' = {
   name: 'placeOrderAPIModule'
   params: {
@@ -165,7 +170,7 @@ module placeOrderAPIModule 'src/place-order/api/api.bicep' = {
   ]
 }
 
-
+// register place order MCP to APIM and API Center
 module placeOrderMCPModule 'src/place-order/mcp-server/mcp.bicep' = {
   name: 'placeOrderMCPModule'
   params: {
@@ -181,7 +186,7 @@ module placeOrderMCPModule 'src/place-order/mcp-server/mcp.bicep' = {
   ]
 }
 
-
+// register MS Learn MCP to APIM and API Center
 module microsoftLearnMCPModule 'src/ms-learn/mcp-server/pass-trought.bicep' = {
   name: 'microsoftLearnMCPModule'
   params: {
