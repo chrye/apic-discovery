@@ -1,0 +1,39 @@
+
+# MCP from API Lab Requirements
+# These packages are required to run the mcp-from-api.ipynb notebook
+
+# MCP SDK
+mcp>=1.0.0
+
+# OpenAI Agents SDK
+openai-agents>=0.1.0
+
+# Azure AI Projects and Agents (with MCP support)
+azure-ai-projects>=1.0.0
+azure-ai-agents>=1.2.0b3
+
+# Azure Identity
+azure-identity>=1.15.0
+
+# Async support for Jupyter
+nest-asyncio>=1.5.0
+
+# HTTP client
+requests>=2.31.0
+
+# LangChain MCP integration (optional, for LangChain examples)
+langchain-mcp-adapters>=0.1.0
+langchain-openai>=0.1.0
+langchain-azure-ai
+
+# A2A SDK
+a2a-sdk>=0.1.0
+
+# Other Core dependencies for MCP from API lab
+openai
+
+# Jupyter notebook execution
+nbconvert>=7.0.0
+ipykernel>=6.0.0
+
+

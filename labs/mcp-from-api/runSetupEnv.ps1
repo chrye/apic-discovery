@@ -1,8 +1,10 @@
-python -m venv labenv
-.\labenv\Scripts\activate.ps1
+python -m venv .venv
+.venv\Scripts\Activate.ps1
 
-pip install -r requirements.txt azure-ai-projects a2a-sdk
+# Install all required packages for the MCP lab
+pip install -r requirements.txt
 
 .\runAzLogin.ps1
 
-python run_all.py
+# Run all cells in mcp-from-api.ipynb
+jupyter nbconvert --to notebook --execute mcp-from-api.ipynb --inplace
