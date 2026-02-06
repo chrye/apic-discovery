@@ -1,7 +1,7 @@
 <policies>
     <inbound>
         <base />
-        <set-backend-service backend-id="orderworflow-backend" />
+        <set-backend-service backend-id="orderworkflow-backend" />
     </inbound>
     <backend>
         <base />
