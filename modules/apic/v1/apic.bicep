@@ -72,6 +72,22 @@ resource mcpEnvironment 'Microsoft.ApiCenter/services/workspaces/environments@20
   }
 }
 
+resource a2aEnvironment 'Microsoft.ApiCenter/services/workspaces/environments@2024-06-01-preview' = {
+  parent: apiCenterWorkspace
+  name: 'a2a'
+  properties: {
+    title: 'a2a'
+    description: 'A2A agent-to-agent default environment'
+    kind: 'a2a'
+    server: {
+      managementPortalUri: [
+        'https://portal.azure.com/'
+      ]
+      type: 'other'
+    }
+  }
+}
+
 // Add API resources using a loop
 resource apiCenterAPI 'Microsoft.ApiCenter/services/workspaces/apis@2024-06-01-preview' = [for mcp in mcpConfigs: {
   parent: apiCenterWorkspace
@@ -146,3 +162,4 @@ output name string = apiCenterService.name
 
 output apiEnvironmentName string = apiEnvironment.name
 output mcpEnvironmentName string = mcpEnvironment.name
+output a2aEnvironmentName string = a2aEnvironment.name

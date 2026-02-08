@@ -1,0 +1,46 @@
+<policies>
+    <inbound>
+        <base />
+        <return-response>
+            <set-status code="200" />
+            <set-header name="Content-Type" exists-action="override">
+                <value>application/json</value>
+            </set-header>
+            <set-body>@{
+                var baseUrl = context.Request.OriginalUrl.Scheme + "://" + context.Request.OriginalUrl.Host + context.Request.OriginalUrl.Port.ToString().Replace("443","").Replace("80","");
+                if (!string.IsNullOrEmpty(context.Request.OriginalUrl.Port.ToString()) && context.Request.OriginalUrl.Port != 443 && context.Request.OriginalUrl.Port != 80) { baseUrl += ":" + context.Request.OriginalUrl.Port; }
+                var card = new JObject(
+                    new JProperty("name", "Outline Generator Agent"),
+                    new JProperty("description", "An intelligent outline generator agent. I can help you create structured outlines for articles and presentations."),
+                    new JProperty("url", baseUrl + "/outline-agent"),
+                    new JProperty("version", "1.0.0"),
+                    new JProperty("defaultInputModes", new JArray("text")),
+                    new JProperty("defaultOutputModes", new JArray("text")),
+                    new JProperty("capabilities", new JObject(
+                        new JProperty("streaming", false),
+                        new JProperty("pushNotifications", false)
+                    )),
+                    new JProperty("skills", new JArray(
+                        new JObject(
+                            new JProperty("id", "generate_outline"),
+                            new JProperty("name", "Generate Content Outline"),
+                            new JProperty("description", "Generates a structured outline with sections for a given topic"),
+                            new JProperty("tags", new JArray("outline", "structure", "writing")),
+                            new JProperty("examples", new JArray("Create an outline about AI", "Generate an outline for cloud computing"))
+                        )
+                    ))
+                );
+                return card.ToString();
+            }</set-body>
+        </return-response>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>

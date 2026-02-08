@@ -1,0 +1,25 @@
+{
+    "name": "Title Generator Agent",
+    "description": "An intelligent title generator agent. I can help you generate catchy, SEO-friendly titles for your blog posts and articles based on a given topic.",
+    "url": "https://APIM_GATEWAY_URL/title-agent",
+    "version": "1.0.0",
+    "defaultInputModes": ["text"],
+    "defaultOutputModes": ["text"],
+    "capabilities": {
+        "streaming": false,
+        "pushNotifications": false
+    },
+    "skills": [
+        {
+            "id": "generate_title",
+            "name": "Generate Blog Title",
+            "description": "Generates a catchy, creative blog post title based on a topic. Provide a topic and receive a well-crafted title suitable for articles and blog posts.",
+            "tags": ["title", "blog", "writing", "content"],
+            "examples": [
+                "Generate a title about artificial intelligence",
+                "Can you give me a catchy title for an article about cloud computing?",
+                "I need a blog title about sustainable energy"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,112 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Summary Generator API",
+        "description": "API to generate concise summaries of provided text content. Returns a brief, neutral summary suitable for abstracts and previews.",
+        "version": "1.0"
+    },
+    "servers": [{
+        "url": "https://replace-me.local/summarygenerator"
+    }],
+    "paths": {
+        "/generate-summary": {
+            "post": {
+                "summary": "Generate a text summary",
+                "description": "Generates a concise summary of the provided text content. Returns a short, neutral summary suitable for article abstracts or content previews.",
+                "operationId": "generate-summary",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SummaryRequest"
+                            },
+                            "examples": {
+                                "article-text": {
+                                    "summary": "Article text example",
+                                    "value": {
+                                        "text": "Artificial intelligence is rapidly transforming healthcare. From diagnostic imaging to drug discovery, AI technologies are enabling faster and more accurate medical decisions. Machine learning algorithms can now detect diseases in medical images with accuracy comparable to expert radiologists."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Generated summary",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SummaryResponse"
+                                },
+                                "examples": {
+                                    "article-summary": {
+                                        "summary": "Summary example",
+                                        "value": {
+                                            "summary": "AI is transforming healthcare through diagnostic imaging and drug discovery, enabling faster and more accurate medical decisions.",
+                                            "wordCount": 17,
+                                            "originalWordCount": 42,
+                                            "generatedAt": "2026-02-07T10:00:00Z"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - missing text"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "SummaryRequest": {
+                "type": "object",
+                "required": ["text"],
+                "properties": {
+                    "text": {
+                        "type": "string",
+                        "description": "The text content to summarize",
+                        "example": "Artificial intelligence is rapidly transforming healthcare..."
+                    }
+                }
+            },
+            "SummaryResponse": {
+                "type": "object",
+                "properties": {
+                    "summary": {
+                        "type": "string",
+                        "description": "The generated summary"
+                    },
+                    "wordCount": {
+                        "type": "integer",
+                        "description": "Word count of the summary"
+                    },
+                    "originalWordCount": {
+                        "type": "integer",
+                        "description": "Word count of the original text"
+                    },
+                    "generatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "apiKeyHeader": {
+                "type": "apiKey",
+                "name": "api-key",
+                "in": "header"
+            },
+            "apiKeyQuery": {
+                "type": "apiKey",
+                "name": "subscription-key",
+                "in": "query"
+            }
+        }
+    }
+}

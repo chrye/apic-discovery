@@ -1,0 +1,25 @@
+{
+    "name": "Outline Generator Agent",
+    "description": "An intelligent outline generator agent powered by Azure API Management. I can help you generate structured outlines for your articles and blog posts.",
+    "url": "https://APIM_GATEWAY_URL/outline-agent",
+    "version": "1.0.0",
+    "defaultInputModes": ["text"],
+    "defaultOutputModes": ["text"],
+    "capabilities": {
+        "streaming": false,
+        "pushNotifications": false
+    },
+    "skills": [
+        {
+            "id": "generate_outline",
+            "name": "Generate Article Outline",
+            "description": "Generates a structured outline with 4 to 6 key sections based on a topic or title. Each section is suitable for structuring a short blog post.",
+            "tags": ["outline", "article", "writing", "content"],
+            "examples": [
+                "Generate an outline for an article about cloud computing",
+                "Can you give me an outline for this topic?",
+                "Create a blog post structure about sustainable energy"
+            ]
+        }
+    ]
+}

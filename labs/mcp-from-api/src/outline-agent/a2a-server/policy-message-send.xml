@@ -1,0 +1,96 @@
+<policies>
+    <inbound>
+        <base />
+        <return-response>
+            <set-status code="200" />
+            <set-header name="Content-Type" exists-action="override">
+                <value>application/json</value>
+            </set-header>
+            <set-body>@{
+                var body = context.Request.Body.As<JObject>(preserveContent: false);
+                var rpcId = body?.Value<string>("id") ?? System.Guid.NewGuid().ToString();
+                var method = body?.Value<string>("method") ?? "";
+
+                if (method != "message/send") {
+                    return new JObject(
+                        new JProperty("jsonrpc", "2.0"),
+                        new JProperty("id", rpcId),
+                        new JProperty("error", new JObject(
+                            new JProperty("code", -32601),
+                            new JProperty("message", "Method not found")
+                        ))
+                    ).ToString();
+                }
+
+                var parts = body?.SelectToken("params.message.parts") as JArray;
+                var userMessage = (parts != null && parts.Count > 0) ? parts[0]?.Value<string>("text") ?? "" : "";
+
+                var formattedTopic = userMessage.Length > 0 ? char.ToUpper(userMessage[0]) + userMessage.Substring(1) : userMessage;
+
+                var outlineSets = new string[][] {
+                    new[] {
+                        "1. Introduction and Background on " + formattedTopic,
+                        "2. Current State of the Industry",
+                        "3. Key Challenges and Opportunities",
+                        "4. Best Practices and Implementation Strategies",
+                        "5. Case Studies and Real-World Examples",
+                        "6. Future Outlook and Predictions"
+                    },
+                    new[] {
+                        "1. What is " + formattedTopic + "?",
+                        "2. Historical Context and Evolution",
+                        "3. Core Concepts and Fundamentals",
+                        "4. Practical Applications",
+                        "5. Tools and Technologies",
+                        "6. Getting Started Guide",
+                        "7. Conclusion and Next Steps"
+                    },
+                    new[] {
+                        "1. Executive Summary of " + formattedTopic,
+                        "2. Problem Statement",
+                        "3. Proposed Solutions",
+                        "4. Technical Architecture",
+                        "5. Implementation Roadmap",
+                        "6. Measuring Success"
+                    }
+                };
+
+                var hash = Math.Abs(userMessage.GetHashCode());
+                var sections = outlineSets[hash % outlineSets.Length];
+                var outlineText = string.Join("\n", sections);
+
+                var taskId = System.Guid.NewGuid().ToString();
+                var msgId = System.Guid.NewGuid().ToString();
+                return new JObject(
+                    new JProperty("jsonrpc", "2.0"),
+                    new JProperty("id", rpcId),
+                    new JProperty("result", new JObject(
+                        new JProperty("id", taskId),
+                        new JProperty("status", new JObject(
+                            new JProperty("state", "completed"),
+                            new JProperty("message", new JObject(
+                                new JProperty("role", "agent"),
+                                new JProperty("parts", new JArray(
+                                    new JObject(
+                                        new JProperty("kind", "text"),
+                                        new JProperty("text", outlineText)
+                                    )
+                                )),
+                                new JProperty("messageId", msgId)
+                            ))
+                        ))
+                    ))
+                ).ToString();
+            }</set-body>
+        </return-response>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
