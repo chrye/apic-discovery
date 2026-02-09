@@ -1,6 +1,6 @@
 # 🐳 MCP Containers Demo
 
-Deploy **Python [FastMCP](https://github.com/jlowin/fastmcp) servers** as containers in **Azure Container Apps (ACA)**, fronted by **Azure API Management** as a unified streamable MCP gateway.
+Deploy **Python [FastMCP](https://github.com/jlowin/fastmcp) servers** as containers in **Azure Container Apps (ACA)**, proxied through **Azure API Management**, registered in **Azure API Center** for discoverability, and monitored via **Application Insights**.
 
 ## Architecture
 
@@ -10,14 +10,17 @@ graph TB
     APIM -->|/weather-mcp/mcp| W[☁️ Weather MCP]
     APIM -->|/catalog-mcp/mcp| C[📦 Product Catalog MCP]
     APIM -->|/order-mcp/mcp| O[🛒 Order Service MCP]
+    APIM -->|/calculator-mcp/mcp| K[🧮 Calculator MCP]
     subgraph ACA[Azure Container Apps Environment]
         W
         C
         O
+        K
     end
-    ACR[Azure Container Registry] -.->|images| ACA
-    LAW[Log Analytics] -.->|logs| ACA
+    ACR[Container Registry] -.->|images| ACA
+    APIC[API Center] -.->|discovery| APIM
     AppInsights[Application Insights] -.->|telemetry| APIM
+    LAW[Log Analytics] -.->|logs| ACA
 ```
 
 ## MCP Servers
@@ -27,13 +30,27 @@ graph TB
 | ☁️ **Weather** | `weather-mcp` | `get_cities`, `get_weather` | Returns cities by country and simulated weather data |
 | 📦 **Product Catalog** | `catalog-mcp` | `search_products`, `get_product`, `list_categories`, `check_stock` | In-memory product catalog with 8 products |
 | 🛒 **Order Service** | `order-mcp` | `place_order`, `get_order`, `list_orders` | Order placement with product validation |
+| 🧮 **Calculator** | `calculator-mcp` | `calculate`, `sqrt`, `convert_units` | Math operations, square roots, and unit conversions |
+
+## What You'll Learn
+
+| Part | Topic | Key Concepts |
+|------|-------|-------------|
+| 1 | **Deploy Infrastructure** | Bicep IaC, APIM, ACA, ACR, API Center, App Insights |
+| 2 | **Build & Deploy Containers** | ACR Tasks (cloud builds), container app updates |
+| 3 | **Test 3 MCP Servers** | Direct ACA access, APIM gateway proxy, MCP client |
+| 4 | **Add 4th MCP (Scale-Out)** | Incremental container deployment, Calculator MCP |
+| 5 | **API Center Discovery** | Browse catalog, filter by `kind: mcp`, dynamic connection |
+| 6 | **Monitoring & Security** | App Insights diagnostics, W3C tracing, request analytics |
+| 7 | **Agent Workflow** | Multi-tool chaining across 4 MCP servers, discover → act |
+| 8 | **Clean Up** | Resource group deletion |
 
 ## Project Structure
 
 ```
 labs/mcp-from-api/
 ├── demo-mcp-containers.bicep       # Bicep orchestration template
-├── demo-mcp-containers.ipynb       # Step-by-step demo notebook
+├── demo-mcp-containers.ipynb       # Step-by-step demo notebook (38 cells)
 └── src/
     ├── weather/container/
     │   ├── mcp_server.py           # FastMCP Weather server
@@ -43,8 +60,12 @@ labs/mcp-from-api/
     │   ├── mcp_server.py           # FastMCP Product Catalog server
     │   ├── Dockerfile
     │   └── requirements.txt
-    └── place-order/container/
-        ├── mcp_server.py           # FastMCP Order Service server
+    ├── place-order/container/
+    │   ├── mcp_server.py           # FastMCP Order Service server
+    │   ├── Dockerfile
+    │   └── requirements.txt
+    └── calculator/container/
+        ├── mcp_server.py           # FastMCP Calculator server
         ├── Dockerfile
         └── requirements.txt
 
@@ -94,8 +115,25 @@ Azure API Management proxies each container app as a **streamable MCP API**, pro
 
 - **Unified gateway** — single endpoint for all MCP servers
 - **Subscription key management** — built-in auth
-- **Logging & analytics** — Application Insights integration
+- **Application Insights diagnostics** — verbose W3C tracing, 100% sampling
 - **Rate limiting / policies** — enterprise controls
+
+### API Center Discoverability
+
+Every MCP server is registered in **Azure API Center** with the full hierarchy:
+
+- **API entry** (`kind: mcp`) with title, description, and VS Code install link
+- **Version** (1.0.0) with lifecycle stage
+- **Definition** and **Deployment** with `runtimeUri` pointing to the APIM gateway
+
+This allows AI agents and developers to **discover MCP servers programmatically** by querying API Center for `kind: mcp` APIs.
+
+### Monitoring & Observability
+
+- **Application Insights diagnostics** on every MCP API with verbose logging
+- **W3C distributed tracing** for end-to-end request correlation
+- **MCP Insights Dashboard** deployed to Azure Portal
+- **Log Analytics** for container app logs and metrics
 
 ## Deployment Flow
 
@@ -103,15 +141,21 @@ Azure API Management proxies each container app as a **streamable MCP API**, pro
 graph LR
     A[1. Deploy Bicep] --> B[2. Build Images<br/>ACR Tasks]
     B --> C[3. Update<br/>Container Apps]
-    C --> D[4. Test Direct<br/>ACA URLs]
-    D --> E[5. Test via<br/>APIM Gateway]
+    C --> D[4. Test 3 MCP<br/>Direct + APIM]
+    D --> E[5. Add 4th MCP<br/>Calculator]
+    E --> F[6. Discover via<br/>API Center]
+    F --> G[7. Monitor via<br/>App Insights]
+    G --> H[8. Agent<br/>Workflow]
 ```
 
-1. **Deploy infrastructure** — Bicep creates APIM, ACR, ACA Environment, Container Apps, and APIM MCP APIs
+1. **Deploy infrastructure** — Bicep creates APIM, ACR, ACA Environment, 4 Container Apps, APIM MCP APIs, API Center registrations, diagnostics, and dashboard
 2. **Build images** — `az acr build` compiles each Dockerfile directly in the cloud (no local Docker needed)
 3. **Update containers** — `az containerapp update` sets the freshly-built images
-4. **Test direct** — connect to ACA container URLs using MCP Python client
-5. **Test via APIM** — connect through the APIM gateway to verify end-to-end proxying
+4. **Test first 3** — connect to Weather, Catalog, Order MCPs (direct ACA + APIM)
+5. **Add Calculator** — build & deploy the 4th MCP, demonstrating scale-out
+6. **Discover via API Center** — query for `kind: mcp` APIs, get runtime URIs, connect dynamically
+7. **Monitor via App Insights** — generate traffic, query telemetry, view request analytics
+8. **Agent workflow** — chain tools across all 4 MCP servers in an end-to-end scenario
 
 ## Quick Start
 
@@ -129,9 +173,12 @@ Open [demo-mcp-containers.ipynb](demo-mcp-containers.ipynb) and run all cells.
 | Resource | SKU/Tier | Purpose |
 |----------|----------|---------|
 | Log Analytics Workspace | Pay-as-you-go | Central logging |
-| Application Insights | — | Monitoring |
+| Application Insights | — | Monitoring & tracing |
 | API Management | Basicv2 | MCP gateway |
-| API Center | Free | API catalog |
+| API Center | Free | MCP discovery catalog |
 | Container Registry | Basic | Image store |
 | Container Apps Environment | Consumption | Serverless containers |
-| 3× Container Apps | 0.25 vCPU / 0.5 GB | MCP servers |
+| 4× Container Apps | 0.25 vCPU / 0.5 GB | MCP servers |
+| 4× App Insights Diagnostics | — | Verbose tracing per API |
+| 4× API Center Registrations | — | MCP discoverability |
+| MCP Insights Dashboard | — | Azure Portal monitoring |
