@@ -1,44 +1,45 @@
----
-name: MCP from REST API
-architectureDiagram: images/model-context-protocol.gif
-categories:
-  - Knowledge & Tools
-services:
-  - MCP
-shortDescription: Transform existing REST APIs to Model Context Protocol with Azure API Management.
-detailedDescription: Playground to transform an existing REST API to the Model Context Protocol with Azure API Management. This lab demonstrates how to expose traditional REST APIs through the MCP standard, enabling AI models to interact with your existing services using the protocol.
-tags: []
-authors:
-  - vieiraae
----
+# Federated API Governance — MCP + A2A Discovery Demo
 
-# APIM ❤️ AI Agents
+End-to-end demo showing how **Azure API Management** and **Azure API Center** enable federated governance across distributed API environments — covering **REST APIs**, **MCP servers**, and **A2A agents** in a single unified catalog.
 
-## [Model Context Protocol (MCP) from REST API lab](mcp-from-api.ipynb)
+## Architecture
 
-[![flow](../../images/model-context-protocol.gif)](mcp-from-api.ipynb)
+| Resource Group | Role | Contents |
+|---------------|------|----------|
+| **RG 2** `rg-lab-mcp-demo-1-1` | Pre-deployed mixed APIs | 4 REST APIs converted to MCP servers + remote MCPs |
+| **RG 3** `rg-lab-mcp-containers` | FastMCP containers | 4 FastMCP servers on Azure Container Apps + APIM + APIC |
+| **RG 4** `rg-lab-a2a-demo` | A2A agents | 3 A2A agents + REST APIs + remote MCPs |
+| **RG 1** `rg-lab-apic-central` | Central catalog | Federated API Center aggregating all APIs from RG 2, 3, 4 |
 
-Playground to transform an existing REST API to the [Model Context Protocol](https://modelcontextprotocol.io/) with Azure API Management. 
+## Getting Started
 
 ### Prerequisites
 
-- [Python 3.12 or later version](https://www.python.org/) installed
-- [VS Code](https://code.visualstudio.com/) installed with the [Jupyter notebook extension](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter) enabled
-- [Python environment](https://code.visualstudio.com/docs/python/environments#_creating-environments) with the [requirements.txt](../../requirements.txt) or run `pip install -r requirements.txt` in your terminal
-- [An Azure Subscription](https://azure.microsoft.com/free/) with [Contributor](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/privileged#contributor) + [RBAC Administrator](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/privileged#role-based-access-control-administrator) or [Owner](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/privileged#owner) roles
-- [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) installed and [Signed into your Azure subscription](https://learn.microsoft.com/cli/azure/authenticate-azure-cli-interactively)
+- [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) installed and signed in
+- [Python 3.12+](https://www.python.org/)
+- An Azure subscription with **Contributor** access
+- Install dependencies: `pip install -r requirements.txt`
 
-### 🚀 Get started
+### Run the Demo
 
-Proceed by opening the [Jupyter notebook](mcp-from-api.ipynb), and follow the steps provided.
+Open **[demo.ipynb](demo.ipynb)** and run the cells top to bottom. The notebook is self-contained — it deploys infrastructure, builds containers, tests APIs, and demonstrates federated discovery.
 
-### 🗑️ Clean up resources
+## Demo Story (10 Parts)
 
-When you're finished with the lab, you should remove all your deployed resources from Azure to avoid extra charges and keep your Azure subscription uncluttered.
-Use the [clean-up-resources notebook](clean-up-resources.ipynb) for that.
+| Part | Topic | Description |
+|------|-------|-------------|
+| 1–3 | **MCP Servers** | Explore existing APIs (RG 2), deploy FastMCP containers (RG 3), test |
+| 4–5 | **Federation** | Deploy central APIC (RG 1), aggregate APIs from RG 2 + RG 3 |
+| 6–7 | **MCP Discovery** | Unified catalog view, dynamic MCP invocation, agent workflow |
+| 8–9 | **A2A Agents** | Explore A2A agents (RG 4), aggregate to central catalog |
+| 10 | **Unified Governance** | Full REST + MCP + A2A catalog, agent card discovery, APIM analytics |
 
----
+## Files
 
-## [A2A Agents from REST API lab](demo-a2a.ipynb)
-
-Transform existing REST APIs into **A2A (Agent-to-Agent) protocol** servers using APIM policies — with automatic discovery in API Center. See the [A2A README](README-A2A.md) for full details.
+| File | Purpose |
+|------|---------|
+| `demo.ipynb` | Main demo notebook — single entry point |
+| `demo-mcp-containers.bicep` | Bicep: deploys Container Apps + APIM + APIC for FastMCP servers |
+| `demo-central-apic.bicep` | Bicep: deploys central API Center with REST/MCP/A2A environments |
+| `requirements.txt` | Python dependencies |
+| `src/*/container/` | FastMCP server source code (Dockerfiles + Python) |
