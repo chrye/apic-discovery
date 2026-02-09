@@ -36,3 +36,9 @@ Proceed by opening the [Jupyter notebook](mcp-from-api.ipynb), and follow the st
 
 When you're finished with the lab, you should remove all your deployed resources from Azure to avoid extra charges and keep your Azure subscription uncluttered.
 Use the [clean-up-resources notebook](clean-up-resources.ipynb) for that.
+
+---
+
+## [A2A Agents from REST API lab](demo-a2a.ipynb)
+
+Transform existing REST APIs into **A2A (Agent-to-Agent) protocol** servers using APIM policies — with automatic discovery in API Center. See the [A2A README](README-A2A.md) for full details.
