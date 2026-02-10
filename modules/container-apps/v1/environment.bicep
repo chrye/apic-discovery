@@ -62,3 +62,10 @@ output acaEnvName string = acaEnv.name
 output acrName string = acr.name
 output acrLoginServer string = acr.properties.loginServer
 output acrId string = acr.id
+
+@description('ACR admin username')
+output acrUsername string = acr.listCredentials().username
+
+@description('ACR admin password')
+@secure()
+output acrPassword string = acr.listCredentials().passwords[0].value

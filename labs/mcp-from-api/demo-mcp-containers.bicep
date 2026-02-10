@@ -97,8 +97,8 @@ module containerApps '../../modules/container-apps/v1/container-app.bicep' = [fo
     acaEnvId: acaEnvModule.outputs.acaEnvId
     acrLoginServer: acaEnvModule.outputs.acrLoginServer
     containerImage: server.image
-    acrUsername: acrUsername
-    acrPassword: acrPassword
+    acrUsername: acaEnvModule.outputs.acrUsername
+    acrPassword: acaEnvModule.outputs.acrPassword
   }
 }]
 
@@ -113,17 +113,13 @@ module mcpProxies '../../modules/apim-streamable-mcp/api.bicep' = [for (server, 
 }]
 
 // ─── 8. Application Insights Diagnostics (verbose tracing per MCP API) ───
-resource apim 'Microsoft.ApiManagement/service@2024-06-01-preview' existing = {
-  name: apimModule.outputs.name
-}
-
 resource mcpDiagnostics 'Microsoft.ApiManagement/service/apis/diagnostics@2022-08-01' = [for (server, i) in mcpServers: {
-  name: '${apimModule.outputs.name}/${server.name}-mcp-tools/applicationinsights'
+  name: '${apimName}/${server.name}-mcp-tools/applicationinsights'
   properties: {
     alwaysLog: 'allErrors'
     httpCorrelationProtocol: 'W3C'
     logClientIp: true
-    loggerId: resourceId(resourceGroup().name, 'Microsoft.ApiManagement/service/loggers', apimModule.outputs.name, 'appinsights-logger')
+    loggerId: resourceId(resourceGroup().name, 'Microsoft.ApiManagement/service/loggers', apimName, 'appinsights-logger')
     metrics: true
     verbosity: 'verbose'
     sampling: {
@@ -137,8 +133,10 @@ resource mcpDiagnostics 'Microsoft.ApiManagement/service/apis/diagnostics@2022-0
 }]
 
 // ─── 9. Register each MCP in API Center for discoverability ───
+var apicServiceName = '${apicServiceNamePrefix}-${resourceSuffix}'
+
 resource apiCenterService 'Microsoft.ApiCenter/services@2024-06-01-preview' existing = {
-  name: apicModule.outputs.name
+  name: apicServiceName
 }
 
 resource apiCenterWorkspace 'Microsoft.ApiCenter/services/workspaces@2024-06-01-preview' existing = {
@@ -157,7 +155,7 @@ resource apiCenterMCPs 'Microsoft.ApiCenter/services/workspaces/apis@2024-06-01-
       {
         description: 'Install in VS Code'
         title: 'Install in VS Code'
-        url: 'https://insiders.vscode.dev/redirect/mcp/install?name=${server.name}&config={"type":"sse","url":"${apim.properties.gatewayUrl}/${server.name}/mcp"}'
+        url: 'https://insiders.vscode.dev/redirect/mcp/install?name=${server.name}&config={"type":"sse","url":"${apimModule.outputs.gatewayUrl}/${server.name}/mcp"}'
       }
     ]
     summary: server.description
@@ -192,39 +190,18 @@ resource mcpDeployments 'Microsoft.ApiCenter/services/workspaces/apis/deployment
   properties: {
     description: '${server.displayName} deployment via APIM gateway'
     title: '${server.displayName} Deployment'
-    environmentId: '/workspaces/default/environments/${apicModule.outputs.mcpEnvironmentName}'
+    environmentId: '/workspaces/default/environments/mcp'
     definitionId: '/workspaces/${apiCenterWorkspace.name}/apis/${apiCenterMCPs[i].name}/versions/${mcpVersions[i].name}/definitions/${mcpDefinitions[i].name}'
     state: 'active'
     server: {
       runtimeUri: [
-        '${apim.properties.gatewayUrl}/${server.name}'
+        '${apimModule.outputs.gatewayUrl}/${server.name}'
       ]
     }
   }
 }]
 
-// ─── 10. MCP Insights Dashboard ───
-module mcpDashboardModule 'src/mcp-insights/dashboard.bicep' = {
-  name: 'mcpDashboardModule'
-  params: {
-    resourceSuffix: resourceSuffix
-    workspaceName: lawModule.outputs.name
-    workspaceId: lawModule.outputs.id
-    workbookId: guid(resourceGroup().id, resourceSuffix, 'mcp-containers-workbook')
-    appInsightsId: appInsightsModule.outputs.id
-    appInsightsName: appInsightsModule.outputs.applicationInsightsName
-  }
-}
 
-// ------------------
-//    ACR credentials (resolved from the deployed ACR)
-// ------------------
-var acrUsername = acr_resource.listCredentials().username
-var acrPassword = acr_resource.listCredentials().passwords[0].value
-
-resource acr_resource 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
-  name: acaEnvModule.outputs.acrName
-}
 
 // ------------------
 //    OUTPUTS
@@ -232,7 +209,7 @@ resource acr_resource 'Microsoft.ContainerRegistry/registries@2023-07-01' existi
 output apimServiceName string = apimModule.outputs.name
 output apimGatewayUrl string = apimModule.outputs.gatewayUrl
 output apimSubscriptions array = apimModule.outputs.apimSubscriptions
-output apicServiceName string = apicModule.outputs.name
+output apicServiceName string = apicServiceName
 
 output acrLoginServer string = acaEnvModule.outputs.acrLoginServer
 output acrName string = acaEnvModule.outputs.acrName
