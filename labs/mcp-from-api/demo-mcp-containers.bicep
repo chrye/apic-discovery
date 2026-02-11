@@ -13,6 +13,9 @@ param apimSku string = 'Basicv2'
 @description('APIM name (must be globally unique)')
 param apimName string
 
+@description('APIM location (can differ from RG location)')
+param apimLocation string = resourceGroup().location
+
 @description('APIM subscriptions config')
 param apimSubscriptionsConfig array = []
 
@@ -65,6 +68,7 @@ module apimModule '../../modules/apim/v2/apim.bicep' = {
   params: {
     apimSku: apimSku
     apimName: apimName
+    location: apimLocation
     apimSubscriptionsConfig: apimSubscriptionsConfig
     lawId: lawModule.outputs.id
     appInsightsId: appInsightsModule.outputs.id

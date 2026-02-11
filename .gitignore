@@ -145,7 +145,7 @@ dmypy.json
 
 # --------------------------------------------------------------------------------
 # List additional inclusions & exclusions
-
+.vscode/
 #policy-updated.xml
 !.vscode/README.md
 

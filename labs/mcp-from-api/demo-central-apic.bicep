@@ -41,13 +41,13 @@ resource apiCenterWorkspace 'Microsoft.ApiCenter/services/workspaces@2024-06-01-
   }
 }
 
-// Environment: REST APIs
-resource apiEnvironment 'Microsoft.ApiCenter/services/workspaces/environments@2024-06-01-preview' = {
+// Environment: REST APIs — Production
+resource apiProdEnvironment 'Microsoft.ApiCenter/services/workspaces/environments@2024-06-01-preview' = {
   parent: apiCenterWorkspace
-  name: 'api'
+  name: 'api-prod'
   properties: {
-    title: 'REST APIs'
-    description: 'REST API environment'
+    title: 'REST APIs — Production'
+    description: 'Production REST API environment'
     kind: 'rest'
     server: {
       managementPortalUri: [
@@ -58,13 +58,30 @@ resource apiEnvironment 'Microsoft.ApiCenter/services/workspaces/environments@20
   }
 }
 
-// Environment: MCP Servers
-resource mcpEnvironment 'Microsoft.ApiCenter/services/workspaces/environments@2024-06-01-preview' = {
+// Environment: REST APIs — Staging
+resource apiStagingEnvironment 'Microsoft.ApiCenter/services/workspaces/environments@2024-06-01-preview' = {
   parent: apiCenterWorkspace
-  name: 'mcp'
+  name: 'api-staging'
   properties: {
-    title: 'MCP Servers'
-    description: 'Model Context Protocol servers environment'
+    title: 'REST APIs — Staging'
+    description: 'Staging REST API environment'
+    kind: 'rest'
+    server: {
+      managementPortalUri: [
+        'https://portal.azure.com/'
+      ]
+      type: 'other'
+    }
+  }
+}
+
+// Environment: MCP Servers — Production
+resource mcpProdEnvironment 'Microsoft.ApiCenter/services/workspaces/environments@2024-06-01-preview' = {
+  parent: apiCenterWorkspace
+  name: 'mcp-prod'
+  properties: {
+    title: 'MCP Servers — Production'
+    description: 'Production Model Context Protocol servers environment'
     kind: 'mcp'
     server: {
       managementPortalUri: [
@@ -75,13 +92,47 @@ resource mcpEnvironment 'Microsoft.ApiCenter/services/workspaces/environments@20
   }
 }
 
-// Environment: A2A Agents
-resource a2aEnvironment 'Microsoft.ApiCenter/services/workspaces/environments@2024-06-01-preview' = {
+// Environment: MCP Servers — Staging
+resource mcpStagingEnvironment 'Microsoft.ApiCenter/services/workspaces/environments@2024-06-01-preview' = {
   parent: apiCenterWorkspace
-  name: 'a2a'
+  name: 'mcp-staging'
   properties: {
-    title: 'A2A Agents'
-    description: 'Agent-to-Agent protocol agents environment'
+    title: 'MCP Servers — Staging'
+    description: 'Staging Model Context Protocol servers environment'
+    kind: 'mcp'
+    server: {
+      managementPortalUri: [
+        'https://portal.azure.com/'
+      ]
+      type: 'other'
+    }
+  }
+}
+
+// Environment: A2A Agents — Production
+resource a2aProdEnvironment 'Microsoft.ApiCenter/services/workspaces/environments@2024-06-01-preview' = {
+  parent: apiCenterWorkspace
+  name: 'a2a-prod'
+  properties: {
+    title: 'A2A Agents — Production'
+    description: 'Production Agent-to-Agent protocol agents environment'
+    kind: 'a2a'
+    server: {
+      managementPortalUri: [
+        'https://portal.azure.com/'
+      ]
+      type: 'other'
+    }
+  }
+}
+
+// Environment: A2A Agents — Staging
+resource a2aStagingEnvironment 'Microsoft.ApiCenter/services/workspaces/environments@2024-06-01-preview' = {
+  parent: apiCenterWorkspace
+  name: 'a2a-staging'
+  properties: {
+    title: 'A2A Agents — Staging'
+    description: 'Staging Agent-to-Agent protocol agents environment'
     kind: 'a2a'
     server: {
       managementPortalUri: [
@@ -98,6 +149,9 @@ resource a2aEnvironment 'Microsoft.ApiCenter/services/workspaces/environments@20
 
 output id string = apiCenterService.id
 output name string = apiCenterService.name
-output apiEnvironmentName string = apiEnvironment.name
-output mcpEnvironmentName string = mcpEnvironment.name
-output a2aEnvironmentName string = a2aEnvironment.name
+output apiProdEnvironmentName string = apiProdEnvironment.name
+output apiStagingEnvironmentName string = apiStagingEnvironment.name
+output mcpProdEnvironmentName string = mcpProdEnvironment.name
+output mcpStagingEnvironmentName string = mcpStagingEnvironment.name
+output a2aProdEnvironmentName string = a2aProdEnvironment.name
+output a2aStagingEnvironmentName string = a2aStagingEnvironment.name
