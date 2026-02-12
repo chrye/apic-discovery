@@ -1,0 +1,25 @@
+{
+    "name": "Summary Generator Agent",
+    "description": "An intelligent summary generator agent. I can help you create concise summaries of text content, suitable for article abstracts and content previews.",
+    "url": "https://APIM_GATEWAY_URL/summary-agent",
+    "version": "1.0.0",
+    "defaultInputModes": ["text"],
+    "defaultOutputModes": ["text"],
+    "capabilities": {
+        "streaming": false,
+        "pushNotifications": false
+    },
+    "skills": [
+        {
+            "id": "generate_summary",
+            "name": "Generate Text Summary",
+            "description": "Generates a concise summary of provided text content. Returns a short, neutral summary suitable for article abstracts or content previews.",
+            "tags": ["summary", "text", "writing", "content"],
+            "examples": [
+                "Summarize this article for me",
+                "Can you give me a brief summary of this text?",
+                "Create a short abstract for this content"
+            ]
+        }
+    ]
+}

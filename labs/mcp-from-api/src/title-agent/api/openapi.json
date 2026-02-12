@@ -1,0 +1,113 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Title Generator API",
+        "description": "API to generate catchy blog post titles based on a given topic. Returns creative, SEO-friendly titles.",
+        "version": "1.0"
+    },
+    "servers": [{
+        "url": "https://replace-me.local/titlegenerator"
+    }],
+    "paths": {
+        "/generate-title": {
+            "post": {
+                "summary": "Generate a blog post title",
+                "description": "Generates a catchy, creative blog post title based on the provided topic. Returns a title suitable for a blog post or article.",
+                "operationId": "generate-title",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TitleRequest"
+                            },
+                            "examples": {
+                                "ai-topic": {
+                                    "summary": "AI topic example",
+                                    "value": {
+                                        "topic": "artificial intelligence in healthcare"
+                                    }
+                                },
+                                "cloud-topic": {
+                                    "summary": "Cloud topic example",
+                                    "value": {
+                                        "topic": "cloud native development"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Generated title",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TitleResponse"
+                                },
+                                "examples": {
+                                    "ai-title": {
+                                        "summary": "AI title example",
+                                        "value": {
+                                            "topic": "artificial intelligence in healthcare",
+                                            "title": "The Future of Medicine: How AI is Revolutionizing Patient Care",
+                                            "generatedAt": "2026-02-07T10:00:00Z"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - missing topic"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "TitleRequest": {
+                "type": "object",
+                "required": ["topic"],
+                "properties": {
+                    "topic": {
+                        "type": "string",
+                        "description": "The topic to generate a title for",
+                        "example": "artificial intelligence in healthcare"
+                    }
+                }
+            },
+            "TitleResponse": {
+                "type": "object",
+                "properties": {
+                    "topic": {
+                        "type": "string",
+                        "example": "artificial intelligence in healthcare"
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "The Future of Medicine: How AI is Revolutionizing Patient Care"
+                    },
+                    "generatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "apiKeyHeader": {
+                "type": "apiKey",
+                "name": "api-key",
+                "in": "header"
+            },
+            "apiKeyQuery": {
+                "type": "apiKey",
+                "name": "subscription-key",
+                "in": "query"
+            }
+        }
+    }
+}

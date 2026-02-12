@@ -1,0 +1,117 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Outline Generator API",
+        "description": "API to generate structured article outlines based on a given topic or title. Returns a concise outline with key sections.",
+        "version": "1.0"
+    },
+    "servers": [{
+        "url": "https://replace-me.local/outlinegenerator"
+    }],
+    "paths": {
+        "/generate-outline": {
+            "post": {
+                "summary": "Generate an article outline",
+                "description": "Generates a structured outline with 4 to 6 key sections based on the provided topic or title. Each section is suitable for structuring a short blog post.",
+                "operationId": "generate-outline",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OutlineRequest"
+                            },
+                            "examples": {
+                                "ai-topic": {
+                                    "summary": "AI topic example",
+                                    "value": {
+                                        "topic": "The Future of AI in Healthcare"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Generated outline",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OutlineResponse"
+                                },
+                                "examples": {
+                                    "ai-outline": {
+                                        "summary": "AI outline example",
+                                        "value": {
+                                            "topic": "The Future of AI in Healthcare",
+                                            "sections": [
+                                                "1. Introduction to AI-Powered Healthcare Solutions",
+                                                "2. Current Applications in Diagnostics and Imaging",
+                                                "3. Machine Learning for Drug Discovery",
+                                                "4. Patient Care and Personalized Medicine",
+                                                "5. Ethical Considerations and Data Privacy",
+                                                "6. Future Outlook and Emerging Trends"
+                                            ],
+                                            "generatedAt": "2026-02-07T10:00:00Z"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - missing topic"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "OutlineRequest": {
+                "type": "object",
+                "required": ["topic"],
+                "properties": {
+                    "topic": {
+                        "type": "string",
+                        "description": "The topic or title to generate an outline for",
+                        "example": "The Future of AI in Healthcare"
+                    }
+                }
+            },
+            "OutlineResponse": {
+                "type": "object",
+                "properties": {
+                    "topic": {
+                        "type": "string",
+                        "example": "The Future of AI in Healthcare"
+                    },
+                    "sections": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "List of outline sections"
+                    },
+                    "generatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "apiKeyHeader": {
+                "type": "apiKey",
+                "name": "api-key",
+                "in": "header"
+            },
+            "apiKeyQuery": {
+                "type": "apiKey",
+                "name": "subscription-key",
+                "in": "query"
+            }
+        }
+    }
+}

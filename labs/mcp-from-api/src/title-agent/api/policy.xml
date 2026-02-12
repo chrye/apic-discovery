@@ -1,0 +1,43 @@
+<policies>
+    <inbound>
+        <base />
+        <return-response>
+            <set-status code="200" />
+            <set-header name="Content-Type" exists-action="override">
+                <value>application/json</value>
+            </set-header>
+            <set-body>@{
+                    var body = context.Request.Body.As<JObject>(preserveContent: true);
+                    var topic = body?.Value<string>("topic") ?? "general technology";
+
+                    // Deterministic title generation based on topic hash
+                    var titles = new[] {
+                        "The Future of {0}: Trends and Innovations Shaping Tomorrow",
+                        "Mastering {0}: A Comprehensive Guide for Modern Professionals",
+                        "Why {0} Matters: Insights and Strategies for Success",
+                        "Breaking Down {0}: What Every Developer Needs to Know",
+                        "The Rise of {0}: How Innovation is Driving Change"
+                    };
+
+                    var hash = Math.Abs(topic.GetHashCode());
+                    var formattedTopic = topic.Length > 0 ? char.ToUpper(topic[0]) + topic.Substring(1) : topic;
+                    var title = string.Format(titles[hash % titles.Length], formattedTopic);
+
+                    return new JObject(
+                        new JProperty("topic", topic),
+                        new JProperty("title", title),
+                        new JProperty("generatedAt", DateTime.UtcNow.ToString("o"))
+                        ).ToString();
+                    }</set-body>
+        </return-response>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>

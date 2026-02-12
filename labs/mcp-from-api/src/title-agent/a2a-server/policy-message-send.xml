@@ -1,0 +1,73 @@
+<policies>
+    <inbound>
+        <base />
+        <return-response>
+            <set-status code="200" />
+            <set-header name="Content-Type" exists-action="override">
+                <value>application/json</value>
+            </set-header>
+            <set-body>@{
+                var body = context.Request.Body.As<JObject>(preserveContent: false);
+                var rpcId = body?.Value<string>("id") ?? System.Guid.NewGuid().ToString();
+                var method = body?.Value<string>("method") ?? "";
+
+                if (method != "message/send") {
+                    return new JObject(
+                        new JProperty("jsonrpc", "2.0"),
+                        new JProperty("id", rpcId),
+                        new JProperty("error", new JObject(
+                            new JProperty("code", -32601),
+                            new JProperty("message", "Method not found")
+                        ))
+                    ).ToString();
+                }
+
+                var parts = body?.SelectToken("params.message.parts") as JArray;
+                var userMessage = (parts != null && parts.Count > 0) ? parts[0]?.Value<string>("text") ?? "" : "";
+
+                var formattedTopic = userMessage.Length > 0 ? char.ToUpper(userMessage[0]) + userMessage.Substring(1) : userMessage;
+                var titles = new[] {
+                    "The Future of {0}: Trends and Innovations Shaping Tomorrow",
+                    "Mastering {0}: A Comprehensive Guide for Modern Professionals",
+                    "Why {0} Matters: Insights and Strategies for Success",
+                    "Breaking Down {0}: What Every Developer Needs to Know",
+                    "The Rise of {0}: How Innovation is Driving Change"
+                };
+                var hash = Math.Abs(userMessage.GetHashCode());
+                var title = string.Format(titles[hash % titles.Length], formattedTopic);
+
+                var taskId = System.Guid.NewGuid().ToString();
+                var msgId = System.Guid.NewGuid().ToString();
+                return new JObject(
+                    new JProperty("jsonrpc", "2.0"),
+                    new JProperty("id", rpcId),
+                    new JProperty("result", new JObject(
+                        new JProperty("id", taskId),
+                        new JProperty("status", new JObject(
+                            new JProperty("state", "completed"),
+                            new JProperty("message", new JObject(
+                                new JProperty("role", "agent"),
+                                new JProperty("parts", new JArray(
+                                    new JObject(
+                                        new JProperty("kind", "text"),
+                                        new JProperty("text", title)
+                                    )
+                                )),
+                                new JProperty("messageId", msgId)
+                            ))
+                        ))
+                    ))
+                ).ToString();
+            }</set-body>
+        </return-response>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>

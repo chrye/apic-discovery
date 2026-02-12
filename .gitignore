@@ -148,7 +148,6 @@ dmypy.json
 
 #policy-updated.xml
 !.vscode/README.md
-!.vscode/settings.json
 
 # Local .terraform directories
 **/.terraform/*
