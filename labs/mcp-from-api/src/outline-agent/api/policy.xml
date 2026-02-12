@@ -1,0 +1,66 @@
+<policies>
+    <inbound>
+        <base />
+        <return-response>
+            <set-status code="200" />
+            <set-header name="Content-Type" exists-action="override">
+                <value>application/json</value>
+            </set-header>
+            <set-body>@{
+                    var body = context.Request.Body.As<JObject>(preserveContent: true);
+                    var topic = body?.Value<string>("topic") ?? "general technology";
+
+                    // Generate deterministic outline sections based on topic
+                    var sectionTemplates = new[] {
+                        new[] {
+                            "1. Introduction and Background on {0}",
+                            "2. Current State of the Industry",
+                            "3. Key Challenges and Opportunities",
+                            "4. Best Practices and Implementation Strategies",
+                            "5. Case Studies and Real-World Examples",
+                            "6. Future Outlook and Predictions"
+                        },
+                        new[] {
+                            "1. Understanding the Fundamentals of {0}",
+                            "2. Historical Context and Evolution",
+                            "3. Core Technologies and Frameworks",
+                            "4. Practical Applications and Use Cases",
+                            "5. Common Pitfalls and How to Avoid Them",
+                            "6. Conclusion and Next Steps"
+                        },
+                        new[] {
+                            "1. Why {0} Matters Today",
+                            "2. Key Concepts and Terminology",
+                            "3. Tools and Technologies Overview",
+                            "4. Step-by-Step Implementation Guide",
+                            "5. Measuring Success and Impact"
+                        }
+                    };
+
+                    var hash = Math.Abs(topic.GetHashCode());
+                    var templates = sectionTemplates[hash % sectionTemplates.Length];
+                    var sections = new JArray();
+                    var formattedTopic = topic.Length > 0 ? char.ToUpper(topic[0]) + topic.Substring(1) : topic;
+                    foreach (var template in templates)
+                    {
+                        sections.Add(string.Format(template, formattedTopic));
+                    }
+
+                    return new JObject(
+                        new JProperty("topic", topic),
+                        new JProperty("sections", sections),
+                        new JProperty("generatedAt", DateTime.UtcNow.ToString("o"))
+                        ).ToString();
+                    }</set-body>
+        </return-response>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>

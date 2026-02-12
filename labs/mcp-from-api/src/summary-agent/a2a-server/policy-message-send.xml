@@ -1,0 +1,71 @@
+<policies>
+    <inbound>
+        <base />
+        <return-response>
+            <set-status code="200" />
+            <set-header name="Content-Type" exists-action="override">
+                <value>application/json</value>
+            </set-header>
+            <set-body>@{
+                var body = context.Request.Body.As<JObject>(preserveContent: false);
+                var rpcId = body?.Value<string>("id") ?? System.Guid.NewGuid().ToString();
+                var method = body?.Value<string>("method") ?? "";
+
+                if (method != "message/send") {
+                    return new JObject(
+                        new JProperty("jsonrpc", "2.0"),
+                        new JProperty("id", rpcId),
+                        new JProperty("error", new JObject(
+                            new JProperty("code", -32601),
+                            new JProperty("message", "Method not found")
+                        ))
+                    ).ToString();
+                }
+
+                var parts = body?.SelectToken("params.message.parts") as JArray;
+                var userMessage = (parts != null && parts.Count > 0) ? parts[0]?.Value<string>("text") ?? "" : "";
+
+                char[] ws = new char[] { ' ', (char)9, (char)10, (char)13 };
+                var words = userMessage.Split(ws, System.StringSplitOptions.RemoveEmptyEntries);
+                var wordCount = words.Length;
+                char[] sentDelims = new char[] { '.', '!', '?' };
+                var sentenceCount = userMessage.Split(sentDelims, System.StringSplitOptions.RemoveEmptyEntries).Length;
+                var preview = wordCount > 20 ? string.Join(" ", words, 0, 20) + "..." : userMessage;
+                var summary = string.Format("This text contains {0} words and approximately {1} sentences. ", wordCount, sentenceCount) +
+                              string.Format("Preview: {0}", preview);
+
+                var taskId = System.Guid.NewGuid().ToString();
+                var msgId = System.Guid.NewGuid().ToString();
+                return new JObject(
+                    new JProperty("jsonrpc", "2.0"),
+                    new JProperty("id", rpcId),
+                    new JProperty("result", new JObject(
+                        new JProperty("id", taskId),
+                        new JProperty("status", new JObject(
+                            new JProperty("state", "completed"),
+                            new JProperty("message", new JObject(
+                                new JProperty("role", "agent"),
+                                new JProperty("parts", new JArray(
+                                    new JObject(
+                                        new JProperty("kind", "text"),
+                                        new JProperty("text", summary)
+                                    )
+                                )),
+                                new JProperty("messageId", msgId)
+                            ))
+                        ))
+                    ))
+                ).ToString();
+            }</set-body>
+        </return-response>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
