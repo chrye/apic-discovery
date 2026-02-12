@@ -145,7 +145,7 @@ dmypy.json
 
 # --------------------------------------------------------------------------------
 # List additional inclusions & exclusions
-
+.vscode/
 #policy-updated.xml
 !.vscode/README.md
 
@@ -210,3 +210,6 @@ labs/ai-foundry-sdk/params.json
 # Ignore local environment files
 .env
 .env.local
+# Temp files from ARM REST API calls
+_temp*.json
+labs/**/_temp*.json

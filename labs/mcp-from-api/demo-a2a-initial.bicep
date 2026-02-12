@@ -11,6 +11,7 @@
 
 param apimSku string
 param apimName string
+param apimLocation string = resourceGroup().location
 param apimSubscriptionsConfig array = []
 param apicLocation string = resourceGroup().location
 param apicServiceNamePrefix string = 'apic'
@@ -44,6 +45,7 @@ module apimModule '../../modules/apim/v2/apim.bicep' = {
   params: {
     apimSku: apimSku
     apimName: apimName
+    location: apimLocation
     apimSubscriptionsConfig: apimSubscriptionsConfig
     lawId: lawModule.outputs.id
     appInsightsId: appInsightsModule.outputs.id
