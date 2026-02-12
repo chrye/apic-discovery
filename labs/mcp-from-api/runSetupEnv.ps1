@@ -7,4 +7,4 @@ pip install -r requirements.txt
 .\runAzLogin.ps1
 
 # Run all cells in mcp-from-api.ipynb
-jupyter nbconvert --to notebook --execute mcp-from-api.ipynb --inplace
+#jupyter nbconvert --to notebook --execute mcp-from-api.ipynb --inplace
